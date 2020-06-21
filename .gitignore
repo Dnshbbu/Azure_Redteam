@@ -18,3 +18,5 @@ toupload/
 
 # all exe files
 *.exe
+
+*.todo

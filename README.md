@@ -9,7 +9,7 @@
 >   - `terraform.exe plan`
 >   - If there are no errors, `terraform.exec apply -auto-approve --var-file=mysecretes.tfvars`
 4. At this point your infrastucture must have stood up. SSH to you ansible master `ssh <DMZ_admin_username>@guacserver.<location>.cloudapp.azure.com`
-5. Run `./ansible.setup.sh`
+5. Run `sudo ./ansible.setup.sh`
 6. Run `ansible-playbook ansible_playbook.yml`
 7. That's it!! If everything went right, you would have your Red team infrastructure in Azure
 

@@ -1,0 +1,20 @@
+#  Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# toupload
+toupload/
+!toupload/ansible_playbook.yml
+!toupload/ansible_setup.sh
+!toupload/hosts
+
+
+# .tfvars files
+*.tfvars
+!mysecrets.tfvars
+
+# all exe files
+*.exe

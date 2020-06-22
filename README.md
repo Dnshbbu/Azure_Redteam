@@ -14,8 +14,13 @@
 7. That's it!! If everything went right, you would have your Red team infrastructure in Azure
 
 ## This script will produce the below infrastucture:
+![alt text](http://xxx)
 
 
+## Customization:
+1. Change the names and number of VMs in ``variables.tf`` before executing the terraform script. Example: if you want 5 kali VMs, ``["kali1","kali2","kali3","kali4","kali5"]``. You may also want to change the names: ``["c2server", "guacserver"]``
+2. Guacamole server will be installed in guacserver VM and can be accessed using ``http://guacserver.<location>.cloudapp.azure.com:8080/guacamole``. The default username/password is guacadmin/guacadmin. Change the password immediately!
+3. Change the VM size and location if you want in the ``variables.tf``
 
 ## !!!IMPORTANT!!!
 **mysecrets.tfvars**<br>

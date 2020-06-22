@@ -95,6 +95,16 @@ variable "kali_image_version" {
   default     = "2019.2.0"
 }
 
+variable "kali_plan_name" {
+  description = "Name of the publisher of the image (az vm image list)"
+  default     = "kali"
+}
+
+variable "kali_plan_product" {
+  description = "Name of the publisher of the image (az vm image list)"
+  default     = "kali-linux"
+}
+
 ## DMZ servers 
 variable "DMZMachines" {
   description = "C2 server and Guacamole server. Used for local hostname, DNS, and storage-related names."
@@ -114,7 +124,7 @@ variable "DMZ_admin_password" {
 variable "KaliMachines" {
   description = "Kali machines"
   type = list(string)
-  default     = ["kali1"]
+  default     = ["kali1","kali2"]
 }
 
 variable "kali_admin_username" {

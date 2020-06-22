@@ -6,10 +6,7 @@
 *.tfstate.*
 
 # toupload
-toupload/
-!toupload/ansible_playbook.yml
-!toupload/ansible_setup.sh
-!toupload/hosts
+toupload/d*
 
 
 # .tfvars files

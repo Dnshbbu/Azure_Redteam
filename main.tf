@@ -38,7 +38,7 @@ resource "azurerm_subnet" "subnet2" {
 # DMZ_SG - Allow inbound access on port 80 (http) and 22 (ssh)
 resource "azurerm_network_security_group" "dmz_sg" {
   #name                = "${var.prefix}-sg"
-  name                  = "${var.subnetname[0]}_SG"
+  name                  = "${var.subnetname[0]}_NSG"
   location            = var.location
   resource_group_name = azurerm_resource_group.tf_azure_guide.name
 
@@ -95,7 +95,7 @@ resource "azurerm_network_security_group" "dmz_sg" {
 # Internal_SG- Allow inbound access on port 80 (http) and 22 (ssh)
 resource "azurerm_network_security_group" "internal_sg" {
   #name                = "${var.prefix}-sg"
-  name                  = "${var.subnetname[1]}_SG"
+  name                  = "${var.subnetname[1]}_NSG"
   location            = var.location
   resource_group_name = azurerm_resource_group.tf_azure_guide.name
 
@@ -126,7 +126,7 @@ resource "azurerm_subnet_network_security_group_association" "internalnsg" {
 # Add Public IP to VM
 resource "azurerm_public_ip" "pips" {
   count = length(var.DMZMachines)
-  name                = "${var.DMZMachines[count.index]}-ip"
+  name                = "${var.DMZMachines[count.index]}-pip"
   location            = var.location
   resource_group_name = azurerm_resource_group.tf_azure_guide.name
   allocation_method   = "Dynamic"
@@ -137,7 +137,7 @@ resource "azurerm_public_ip" "pips" {
 # NIC for DMZMachines
 resource "azurerm_network_interface" "DMZnics" {
   count = length(var.DMZMachines)
-  name                = "acctni-${var.DMZMachines[count.index]}"
+  name                = "nic-${var.DMZMachines[count.index]}"
   location            = var.location
   resource_group_name = azurerm_resource_group.tf_azure_guide.name
 
@@ -152,7 +152,7 @@ resource "azurerm_network_interface" "DMZnics" {
 # NIC for KaliMachines
 resource "azurerm_network_interface" "KALInics" {
   count = length(var.KaliMachines)
-  name                = "acctni-${var.KaliMachines[count.index]}"
+  name                = "nic-${var.KaliMachines[count.index]}"
   location            = var.location
   resource_group_name = azurerm_resource_group.tf_azure_guide.name
 
@@ -232,8 +232,7 @@ resource "azurerm_virtual_machine" "DMZVMs" {
 
 # Create Kali VMs
 resource "azurerm_virtual_machine" "KALIVMs" {
-  #count = "${length(var.KaliMachines) == "1" ? 0 : 1} "
-  count = 0
+  count = length(var.KaliMachines)
   name                = var.KaliMachines[count.index]
   location            = var.location
   resource_group_name = azurerm_resource_group.tf_azure_guide.name
@@ -249,6 +248,12 @@ resource "azurerm_virtual_machine" "KALIVMs" {
     offer     = var.kali_image_offer
     sku       = var.kali_image_sku
     version   = var.kali_image_version
+  }
+
+  plan {
+    name              = var.kali_plan_name
+    publisher         =  var.kali_image_publisher
+    product           = var.kali_plan_product
   }
 
   storage_os_disk {

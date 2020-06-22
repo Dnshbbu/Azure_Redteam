@@ -14,7 +14,7 @@
 7. That's it!! If everything went right, you would have your Red team infrastructure in Azure
 
 ## This script will produce the below infrastucture:
-![alt text](http://xxx)
+![Image](https://github.com/Dnshbbu/Azure_Redteam/blob/master/assets/CreatedNetworkTopology.png?raw=true)
 
 
 ## Customization:

@@ -7,7 +7,7 @@ provider "azurerm" {
 }
 
 # Resource group
-resource "azurerm_resource_group" "tf_azure_guide" {
+resource "azurerm_resource_group" "rg" {
   name     = var.resource_group
   location = var.location
 }
@@ -15,23 +15,38 @@ resource "azurerm_resource_group" "tf_azure_guide" {
 # Virtual Network
 resource "azurerm_virtual_network" "vnet" {
   name                = var.virtual_network_name
-  location            = azurerm_resource_group.tf_azure_guide.location
+  location            = azurerm_resource_group.rg.location
   address_space       = ["${var.address_space}"]
-  resource_group_name = azurerm_resource_group.tf_azure_guide.name
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+# Private DNS
+resource "azurerm_private_dns_zone" "example" {
+  name                = "redteam.com"
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+# Link VNET to Azure Private DNS
+resource "azurerm_private_dns_zone_virtual_network_link" "example" {
+  name                  = "test"
+  resource_group_name   = azurerm_resource_group.rg.name
+  private_dns_zone_name = azurerm_private_dns_zone.example.name
+  virtual_network_id    = azurerm_virtual_network.vnet.id
+  registration_enabled  = true
 }
 
 # Subnet1: DMZ
 resource "azurerm_subnet" "subnet1" {
   name                 = var.subnetname[0]
   virtual_network_name = azurerm_virtual_network.vnet.name
-  resource_group_name  = azurerm_resource_group.tf_azure_guide.name
+  resource_group_name  = azurerm_resource_group.rg.name
   address_prefixes     = [var.subnets[0]]
 }
 # Subnet2: Internal
 resource "azurerm_subnet" "subnet2" {
   name                 = var.subnetname[1]
   virtual_network_name = azurerm_virtual_network.vnet.name
-  resource_group_name  = azurerm_resource_group.tf_azure_guide.name
+  resource_group_name  = azurerm_resource_group.rg.name
   address_prefixes     = [var.subnets[1]]
 }
 
@@ -40,7 +55,7 @@ resource "azurerm_network_security_group" "dmz_sg" {
   #name                = "${var.prefix}-sg"
   name                  = "${var.subnetname[0]}_NSG"
   location            = var.location
-  resource_group_name = azurerm_resource_group.tf_azure_guide.name
+  resource_group_name = azurerm_resource_group.rg.name
 
   security_rule {
     name                       = "HTTP_80"
@@ -97,7 +112,7 @@ resource "azurerm_network_security_group" "internal_sg" {
   #name                = "${var.prefix}-sg"
   name                  = "${var.subnetname[1]}_NSG"
   location            = var.location
-  resource_group_name = azurerm_resource_group.tf_azure_guide.name
+  resource_group_name = azurerm_resource_group.rg.name
 
   security_rule {
     name                       = "DMZ_to_Internal_SSH"
@@ -128,7 +143,7 @@ resource "azurerm_public_ip" "pips" {
   count = length(var.DMZMachines)
   name                = "${var.DMZMachines[count.index]}-pip"
   location            = var.location
-  resource_group_name = azurerm_resource_group.tf_azure_guide.name
+  resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Dynamic"
   domain_name_label   = var.DMZMachines[count.index]
 }
@@ -139,7 +154,7 @@ resource "azurerm_network_interface" "DMZnics" {
   count = length(var.DMZMachines)
   name                = "nic-${var.DMZMachines[count.index]}"
   location            = var.location
-  resource_group_name = azurerm_resource_group.tf_azure_guide.name
+  resource_group_name = azurerm_resource_group.rg.name
 
   ip_configuration {
     name                          = "${var.prefix}ipconfig"
@@ -154,7 +169,7 @@ resource "azurerm_network_interface" "KALInics" {
   count = length(var.KaliMachines)
   name                = "nic-${var.KaliMachines[count.index]}"
   location            = var.location
-  resource_group_name = azurerm_resource_group.tf_azure_guide.name
+  resource_group_name = azurerm_resource_group.rg.name
 
   ip_configuration {
     name                          = "${var.prefix}ipconfig"
@@ -168,7 +183,7 @@ resource "azurerm_virtual_machine" "DMZVMs" {
   count = length(var.DMZMachines)
   name                = var.DMZMachines[count.index]
   location            = var.location
-  resource_group_name = azurerm_resource_group.tf_azure_guide.name
+  resource_group_name = azurerm_resource_group.rg.name
   vm_size             = var.vm_size
 
   #network_interface_ids = [element(azurerm_network_interface.tf-guide-nic.*.id, count.index)]
@@ -235,7 +250,7 @@ resource "azurerm_virtual_machine" "KALIVMs" {
   count = length(var.KaliMachines)
   name                = var.KaliMachines[count.index]
   location            = var.location
-  resource_group_name = azurerm_resource_group.tf_azure_guide.name
+  resource_group_name = azurerm_resource_group.rg.name
   vm_size             = var.kali_vm_size
 
   #network_interface_ids = [element(azurerm_network_interface.tf-guide-nic.*.id, count.index)]
@@ -274,3 +289,9 @@ resource "azurerm_virtual_machine" "KALIVMs" {
   }
 
 }
+
+# resource "azurerm_marketplace_agreement" "KALIVMs" {
+#     publisher = var.kali_image_publisher
+#     offer     = var.kali_image_offer
+#     plan      = var.kali_plan_name
+# }

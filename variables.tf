@@ -109,7 +109,7 @@ variable "kali_plan_product" {
 variable "DMZMachines" {
   description = "C2 server and Guacamole server. Used for local hostname, DNS, and storage-related names."
   type = list(string)
-  default     = ["c2server", "guacserver"]
+  default     = ["guacserver","c2server"]
 }
 
 variable "DMZ_admin_username" {

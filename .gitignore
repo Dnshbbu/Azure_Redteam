@@ -7,6 +7,7 @@
 
 # toupload
 toupload/d*
+toupload/backup*
 
 
 # .tfvars files
